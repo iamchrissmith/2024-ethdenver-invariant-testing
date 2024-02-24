@@ -16,3 +16,6 @@ DAI code has been updated slighlty to be compatible with Solidity 0.8 and Foundr
 ## Branches / Walkthrough
 
 `main`: Initial Repo setup
+`1-invariant-setup`: [Setting up basic invariant testing infrastructure](https://github.com/iamchrissmith/2024-ethdenver-invariant-testing/pull/1)
+`2-handler-setup`: [Setting up the functionality of the Handler](https://github.com/iamchrissmith/2024-ethdenver-invariant-testing/pull/2)
+`3-add-balance-invariant`: [Adding our first real invariant](https://github.com/iamchrissmith/2024-ethdenver-invariant-testing/pull/3)
