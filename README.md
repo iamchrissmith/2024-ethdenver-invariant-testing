@@ -1,66 +1,18 @@
-## Foundry
+# Invariant Fuzz Testing Presentation and Code
 
-**Foundry is a blazing fast, portable and modular toolkit for Ethereum application development written in Rust.**
+## What is this and whoami
+This repo is built for a talk I am giving at EthDenver 2024 to explain what invariant fuzz testing is and show how to use it with [Foundry](https://book.getfoundry.sh/forge/invariant-testing).
 
-Foundry consists of:
+I am an independent security research who works with clients through invariant test engineering, security reviews and protocol/technical advising.
 
--   **Forge**: Ethereum testing framework (like Truffle, Hardhat and DappTools).
--   **Cast**: Swiss army knife for interacting with EVM smart contracts, sending transactions and getting chain data.
--   **Anvil**: Local Ethereum node, akin to Ganache, Hardhat Network.
--   **Chisel**: Fast, utilitarian, and verbose solidity REPL.
+Formerly, I was a (pre-endgame) Senior Protocol Engineer with MakerDAO, a Maker Foundation Smart Contract Engineer (securing and launching MCD), and a Backend and Smart Contract Engineer with ConsenSys.
 
-## Documentation
+I can be found on the internet occassionally on [Twitter](https://twitter.com/iamchrissmith), [LinkedIn](https://www.linkedin.com/in/iamchrisryansmith/), at my [business website](https://lefthandcypher.com/) and, of course, here on [GitHub](https://github.com/iamchrissmith).
 
-https://book.getfoundry.sh/
+**Note:** All code in this repo is for demonstration purposes only
 
-## Usage
+DAI code has been updated slighlty to be compatible with Solidity 0.8 and Foundry.
 
-### Build
+## Branches / Walkthrough
 
-```shell
-$ forge build
-```
-
-### Test
-
-```shell
-$ forge test
-```
-
-### Format
-
-```shell
-$ forge fmt
-```
-
-### Gas Snapshots
-
-```shell
-$ forge snapshot
-```
-
-### Anvil
-
-```shell
-$ anvil
-```
-
-### Deploy
-
-```shell
-$ forge script script/Counter.s.sol:CounterScript --rpc-url <your_rpc_url> --private-key <your_private_key>
-```
-
-### Cast
-
-```shell
-$ cast <subcommand>
-```
-
-### Help
-
-```shell
-$ forge --help
-$ anvil --help
-$ cast --help
-```
+`main`: Initial Repo setup
