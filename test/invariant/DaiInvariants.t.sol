@@ -53,10 +53,16 @@ contract DaiInvariants is Test {
         targetContract(address(_daiHandler));
     }
 
-    function invariant_dai_decimals() public {
-        require(
-            dai.decimals() == 18,
-            "Invariant Dai Decimals"
-        );
+    // Sum of all DST balances should equal total supply
+    function invariant_dai_balances_equal_totalSupply() public {
+        uint256 sumBalances;
+        uint256 dstCount = _daiHandler.dstsLength();
+
+        for (uint256 i = 0; i < dstCount; i++) {
+            (address addr, ) = _daiHandler.dsts(i);
+            sumBalances += dai.balanceOf(addr);
+        }
+
+        require(sumBalances == dai.totalSupply(), "DaiInvariants/sumBalances-not-equal-totalSupply");
     }
 }

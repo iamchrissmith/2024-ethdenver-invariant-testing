@@ -66,3 +66,11 @@ You will need to decide whether you are going to `bound` your inputs so that cal
 #### Requires/Reverts
 
 You can add handler function level assertions to these functions if you want to assert certain things are true during a specific call.  This makes the handler functions act like fuzz tests within your invariant test suite.
+
+### 3 - Our First Invariant
+
+branch: `3-add-balance-invariant`
+
+Here we add our first "real" invariant.  After setup and then after every handler function call this invariant will be tested to ensure it holds true.  If it fails, we will get a sequence that can be used to analyze the calls that were made to cause the violation.
+
+In this case, we are summing the balance of each destination (`dst`) actor and ensure that sum **always** equals the `dai.totalSupply()`.
