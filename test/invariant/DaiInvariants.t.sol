@@ -31,7 +31,11 @@ contract DaiInvariants is Test {
         // give the dai handler permission to mint dai
         dai.rely(address(_daiHandler));
 
-        bytes4[] memory selectors = new bytes4[](0);
+        // setup Actors in Handler
+        _daiHandler.init();
+
+        bytes4[] memory selectors = new bytes4[](1);
+        selectors[0] = _daiHandler.transfer.selector;
 
         targetSelector(
             FuzzSelector({
