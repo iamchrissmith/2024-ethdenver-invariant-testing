@@ -60,6 +60,12 @@ contract DaiHandler is Test {
             dai.mint(_actor.addr, 1000 ether);
         }
 
+        Actor memory governance;
+        (governance.addr, governance.key) = makeAddrAndKey(string(abi.encodePacked("Governance")));
+        actors.push(governance);
+        dsts.push(governance);
+        dai.rely(governance.addr);
+
         Actor memory zero;
         (zero.addr, zero.key) = makeAddrAndKey(string(abi.encodePacked("Zero")));
         zero.addr = address(0);
@@ -80,6 +86,109 @@ contract DaiHandler is Test {
             expectedError(reason);
         } catch (bytes memory reason) {
             console.log("Transfer failed: ");
+            console.logBytes(reason);
+        }
+    }
+
+    function transferFrom(
+        uint256 _actorIndex,
+        uint256 _srcIndex,
+        uint256 _dstIndex,
+        uint256 _wad
+    ) public useRandomActor(_actorIndex) resetErrors {
+        Actor memory src = _selectActor(_srcIndex);
+        Actor memory dst = _selectDst(_dstIndex);
+        try dai.transferFrom(src.addr, dst.addr, _wad) {
+            console.log("TransferFrom succeeded");
+        } catch Error(string memory reason) {
+            if(dai.balanceOf(src.addr) < _wad) addExpectedError("Dai/insufficient-balance");
+            if(dai.allowance(actor.addr, src.addr) < _wad) addExpectedError("Dai/insufficient-allowance");
+            expectedError(reason);
+        } catch (bytes memory reason) {
+            console.log("TransferFrom failed: ");
+            console.logBytes(reason);
+        }
+    }
+
+    function mint(
+        uint256 _actorIndex,
+        uint256 _dstIndex,
+        uint256 _wad
+    ) public useRandomActor(_actorIndex) resetErrors {
+        Actor memory dst = _selectDst(_dstIndex);
+        try dai.mint(dst.addr, _wad) {
+            console.log("Mint succeeded");
+        } catch Error(string memory reason) {
+            if(dai.wards(actor.addr) == 0) addExpectedError("Dai/not-authorized");
+            expectedError(reason);
+        } catch (bytes memory reason) {
+            console.log("Mint failed: ");
+            console.logBytes(reason);
+        }
+    }
+
+    function burn(
+        uint256 _actorIndex,
+        uint256 _usrIndex,
+        uint256 _wad
+    ) public useRandomActor(_actorIndex) resetErrors {
+        Actor memory usr = _selectActor(_usrIndex);
+        try dai.burn(usr.addr,  _wad) {
+            console.log("burn succeeded");
+        } catch Error(string memory reason) {
+            if(dai.balanceOf(usr.addr) < _wad) addExpectedError("Dai/insufficient-balance");
+            if(dai.allowance(usr.addr, actor.addr) < _wad) addExpectedError("Dai/insufficient-allowance");
+            expectedError(reason);
+        } catch (bytes memory reason) {
+            console.log("burn failed: ");
+            console.logBytes(reason);
+        }
+    }
+
+    function approve(
+        uint256 _actorIndex,
+        uint256 _usrIndex,
+        uint256 _wad
+    ) public useRandomActor(_actorIndex) resetErrors {
+        Actor memory usr = _selectActor(_usrIndex);
+        try dai.approve(usr.addr,  _wad) {
+            console.log("approve succeeded");
+        } catch Error(string memory reason) {
+            expectedError(reason);
+        } catch (bytes memory reason) {
+            console.log("approve failed: ");
+            console.logBytes(reason);
+        }
+    }
+
+    function rely(
+        uint256 _actorIndex,
+        uint256 _guyIndex
+    ) public useRandomActor(_actorIndex) resetErrors {
+        Actor memory guy = _selectActor(_guyIndex);
+        try dai.rely(guy.addr) {
+            console.log("rely succeeded");
+        } catch Error(string memory reason) {
+            if(dai.wards(actor.addr) == 0) addExpectedError("Dai/not-authorized");
+            expectedError(reason);
+        } catch (bytes memory reason) {
+            console.log("rely failed: ");
+            console.logBytes(reason);
+        }
+    }
+
+    function deny(
+        uint256 _actorIndex,
+        uint256 _guyIndex
+    ) public useRandomActor(_actorIndex) resetErrors {
+        Actor memory guy = _selectActor(_guyIndex);
+        try dai.deny(guy.addr) {
+            console.log("deny succeeded");
+        } catch Error(string memory reason) {
+            if(dai.wards(actor.addr) == 0) addExpectedError("Dai/not-authorized");
+            expectedError(reason);
+        } catch (bytes memory reason) {
+            console.log("deny failed: ");
             console.logBytes(reason);
         }
     }
