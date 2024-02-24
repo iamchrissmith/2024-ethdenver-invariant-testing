@@ -34,7 +34,6 @@ contract DaiInvariants is Test {
         // setup Actors in Handler
         _daiHandler.init();
 
-<<<<<<< HEAD
         bytes4[] memory selectors = new bytes4[](7);
         selectors[0] = _daiHandler.transfer.selector;
         selectors[1] = _daiHandler.transferFrom.selector;
@@ -43,10 +42,6 @@ contract DaiInvariants is Test {
         selectors[4] = _daiHandler.approve.selector;
         selectors[5] = _daiHandler.rely.selector;
         selectors[6] = _daiHandler.deny.selector;
-=======
-        bytes4[] memory selectors = new bytes4[](1);
-        selectors[0] = _daiHandler.transfer.selector;
->>>>>>> ea4763e (add first handler function)
 
         targetSelector(
             FuzzSelector({
