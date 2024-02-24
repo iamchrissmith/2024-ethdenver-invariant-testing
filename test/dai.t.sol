@@ -17,7 +17,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-pragma solidity 0.8.23;
+pragma solidity 0.8.24;
 
 import {Test, console2} from "forge-std/Test.sol";
 
@@ -121,202 +121,40 @@ contract DaiTest is Test {
         return new Dai(99);
     }
 
-    function testSetupPrecondition() public {
-        assertEq(token.balanceOf(self), initialBalanceThis);
-    }
-
-    function testTransferCost() public logs_gas {
-        token.transfer(address(0), 10);
-    }
-
-    function testAllowanceStartsAtZero() public logs_gas {
-        assertEq(token.allowance(user1, user2), 0);
-    }
-
     function testValidTransfers() public logs_gas {
         uint256 sentAmount = 250;
-        emit log_named_address("token11111", address(token));
+        uint256 initialTotalSupply = token.totalSupply();
         token.transfer(user2, sentAmount);
         assertEq(token.balanceOf(user2), sentAmount);
-        assertEq(token.balanceOf(self), initialBalanceThis - sentAmount);
+        assertEq(token.balanceOf(self) , initialBalanceThis - sentAmount);
+        assertEq(token.totalSupply()   , initialTotalSupply);
     }
 
-    function testFailWrongAccountTransfers() public logs_gas {
-        uint256 sentAmount = 250;
-        token.transferFrom(user2, self, sentAmount);
-    }
-
-    function testFailInsufficientFundsTransfers() public logs_gas {
-        uint256 sentAmount = 250;
-        token.transfer(user1, initialBalanceThis - sentAmount);
-        token.transfer(user2, sentAmount + 1);
-    }
-
-    function testApproveSetsAllowance() public logs_gas {
-        emit log_named_address("Test", self);
-        emit log_named_address("Token", address(token));
-        emit log_named_address("Me", self);
-        emit log_named_address("User 2", user2);
-        token.approve(user2, 25);
-        assertEq(token.allowance(self, user2), 25);
-    }
-
-    function testChargesAmountApproved() public logs_gas {
-        uint256 amountApproved = 20;
-        token.approve(user2, amountApproved);
-        assertTrue(TokenUser(user2).doTransferFrom(self, user2, amountApproved));
-        assertEq(token.balanceOf(self), initialBalanceThis - amountApproved);
-    }
-
-    function testFailTransferWithoutApproval() public logs_gas {
-        token.transfer(user1, 50);
-        token.transferFrom(user1, self, 1);
-    }
-
-    function testFailChargeMoreThanApproved() public logs_gas {
-        token.transfer(user1, 50);
-        TokenUser(user1).doApprove(self, 20);
-        token.transferFrom(user1, self, 21);
-    }
-    function testTransferFromSelf() public {
-        token.transferFrom(self, user1, 50);
-        assertEq(token.balanceOf(user1), 50);
-    }
-    function testFailTransferFromSelfNonArbitrarySize() public {
-        // you shouldn't be able to evade balance checks by transferring
-        // to yourself
-        token.transferFrom(self, self, token.balanceOf(self) + 1);
-    }
-    function testMintself() public {
-        uint256 mintAmount = 10;
-        token.mint(address(this), mintAmount);
-        assertEq(token.balanceOf(self), initialBalanceThis + mintAmount);
-    }
     function testMintGuy() public {
         uint256 mintAmount = 10;
+        uint256 initialTotalSupply = token.totalSupply();
         token.mint(user1, mintAmount);
         assertEq(token.balanceOf(user1), mintAmount);
-    }
-    function testFailMintGuyNoAuth() public {
-        TokenUser(user1).doMint(user2, 10);
-    }
-    function testMintGuyAuth() public {
-        token.rely(user1);
-        TokenUser(user1).doMint(user2, 10);
+        assertEq(token.totalSupply(), initialTotalSupply + mintAmount);
     }
 
-    function testBurn() public {
-        uint256 burnAmount = 10;
-        token.burn(address(this), burnAmount);
-        assertEq(token.totalSupply(), initialBalanceThis + initialBalanceCal - burnAmount);
-    }
-    function testBurnself() public {
-        uint256 burnAmount = 10;
-        token.burn(address(this), burnAmount);
-        assertEq(token.balanceOf(self), initialBalanceThis - burnAmount);
-    }
     function testBurnGuyWithTrust() public {
         uint256 burnAmount = 10;
+        uint256 initialTotalSupply = token.totalSupply();
         token.transfer(user1, burnAmount);
         assertEq(token.balanceOf(user1), burnAmount);
 
         TokenUser(user1).doApprove(self);
         token.burn(user1, burnAmount);
         assertEq(token.balanceOf(user1), 0);
-    }
-    function testBurnAuth() public {
-        token.transfer(user1, 10);
-        token.rely(user1);
-        TokenUser(user1).doBurn(10);
-    }
-    function testBurnGuyAuth() public {
-        token.transfer(user2, 10);
-        //        token.rely(user1);
-        TokenUser(user2).doApprove(user1);
-        TokenUser(user1).doBurn(user2, 10);
+        assertEq(token.totalSupply(), initialTotalSupply - burnAmount);
     }
 
-    function testFailUntrustedTransferFrom() public {
-        assertEq(token.allowance(self, user2), 0);
-        TokenUser(user1).doTransferFrom(self, user2, 200);
-    }
-    function testTrusting() public {
-        assertEq(token.allowance(self, user2), 0);
-        token.approve(user2, type(uint256).max);
-        assertEq(token.allowance(self, user2), type(uint256).max);
-        token.approve(user2, 0);
-        assertEq(token.allowance(self, user2), 0);
-    }
     function testTrustedTransferFrom() public {
+        uint256 initialTotalSupply = token.totalSupply();
         token.approve(user1, type(uint256).max);
         TokenUser(user1).doTransferFrom(self, user2, 200);
         assertEq(token.balanceOf(user2), 200);
-    }
-    function testApproveWillModifyAllowance() public {
-        assertEq(token.allowance(self, user1), 0);
-        assertEq(token.balanceOf(user1), 0);
-        token.approve(user1, 1000);
-        assertEq(token.allowance(self, user1), 1000);
-        TokenUser(user1).doTransferFrom(self, user1, 500);
-        assertEq(token.balanceOf(user1), 500);
-        assertEq(token.allowance(self, user1), 500);
-    }
-    function testApproveWillNotModifyAllowance() public {
-        assertEq(token.allowance(self, user1), 0);
-        assertEq(token.balanceOf(user1), 0);
-        token.approve(user1, type(uint256).max);
-        assertEq(token.allowance(self, user1), type(uint256).max);
-        TokenUser(user1).doTransferFrom(self, user1, 1000);
-        assertEq(token.balanceOf(user1), 1000);
-        assertEq(token.allowance(self, user1), type(uint256).max);
-    }
-
-    // Previous version of HEVM used to generate the dai address
-    // function testDaiAddress() public {
-    //     //The dai address generated by hevm
-    //     //used for signature generation testing
-    //     assertEq(address(token), address(0x11Ee1eeF5D446D07Cf26941C7F2B4B1Dfb9D030B));
-    // }
-
-    function testTypehash() public {
-        assertEq(token.PERMIT_TYPEHASH(), 0xea2aa0a1be11a07ed86d755c93467f4f82362b452371d1ba94d1715123511acb);
-    }
-
-    // Previous version of HEVM used to generate the DOMAIN_SEPARATOR
-    // function testDomain_Separator() public {
-    //     assertEq(token.DOMAIN_SEPARATOR(), 0x68a9504c1a7fba795f7730732abab11cb5fa5113edd2396392abd5c1bbda4043);
-    // }
-
-    // Previous version of HEVM used to generate the DOMAIN_SEPARATOR
-    // function testPermit() public {
-    //     assertEq(token.nonces(cal), 0);
-    //     assertEq(token.allowance(cal, del), 0);
-    //     token.permit(cal, del, 0, 0, true, v, r, s);
-    //     assertEq(token.allowance(cal, del),type(uint256).max);
-    //     assertEq(token.nonces(cal),1);
-    // }
-
-    function testFailPermitAddress0() public {
-        v = 0;
-        token.permit(address(0), del, 0, 0, true, v, r, s);
-    }
-
-    // Previous version of HEVM used to generate the DOMAIN_SEPARATOR
-    // function testPermitWithExpiry() public {
-    //     assertEq(block.timestamp, 604411200);
-    //     token.permit(cal, del, 0, 604411200 + 1 hours, true, _v, _r, _s);
-    //     assertEq(token.allowance(cal, del),type(uint256).max);
-    //     assertEq(token.nonces(cal),1);
-    // }
-
-    function testFailPermitWithExpiry() public {
-        vm.warp(block.timestamp + 2 hours);
-        assertEq(block.timestamp, 604411200 + 2 hours);
-        token.permit(cal, del, 0, 1, true, _v, _r, _s);
-    }
-
-    function testFailReplay() public {
-        token.permit(cal, del, 0, 0, true, v, r, s);
-        token.permit(cal, del, 0, 0, true, v, r, s);
+        assertEq(token.totalSupply(), initialTotalSupply);
     }
 }

@@ -17,7 +17,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-pragma solidity 0.8.23;
+pragma solidity 0.8.24;
 
 contract Dai {
     // --- Auth ---
@@ -42,14 +42,6 @@ contract Dai {
 
     event Approval(address indexed src, address indexed guy, uint256 wad);
     event Transfer(address indexed src, address indexed dst, uint256 wad);
-
-    // // --- Math ---
-    // function add(uint256 x, uint256 y) internal pure returns (uint256 z) {
-    //     require((z = x + y) >= x);
-    // }
-    // function sub(uint256 x, uint256 y) internal pure returns (uint256 z) {
-    //     require((z = x - y) <= x);
-    // }
 
     // --- EIP712 niceties ---
     bytes32 public DOMAIN_SEPARATOR;
