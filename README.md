@@ -45,3 +45,27 @@ These contracts are essentially wrappers around the contracts/functionality we w
 #### Regressions
 
 If we find a failing sequence, these are the unit tests that we can use to reproduce the failure and check our fix.
+
+### 2 - Handler Setup
+
+branch: `2-handler-setup`
+
+Important Concepts:
+
+#### Handler's purpose
+
+Your handler is the wrapper around the contract that you are testing. You should add all functions you want to be included in your testing to this contract (most likely all external functions that modify state).  The test suite will call these functions in random order with random input.
+
+Calls to the contract you're testing should be wrapped in `try/catch` blocks so you can handle errors.
+
+#### Actors
+
+To make the test suite better simulate what will happen post deployment, you need a set of actors and destination addresses that will be the `msg.sender` and targets for your function calls.
+
+#### Error handling
+
+You will need to decide whether you are going to `bound` your inputs so that calls are successful or if you are going to add error exclusions.
+
+#### Requires/Reverts
+
+You can add handler function level assertions to these functions if you want to assert certain things are true during a specific call.  This makes the handler functions act like fuzz tests within your invariant test suite.
