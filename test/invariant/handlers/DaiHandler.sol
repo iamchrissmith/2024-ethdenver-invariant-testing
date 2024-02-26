@@ -102,7 +102,7 @@ contract DaiHandler is Test {
             console.log("TransferFrom succeeded");
         } catch Error(string memory reason) {
             if(dai.balanceOf(src.addr) < _wad) addExpectedError("Dai/insufficient-balance");
-            if(dai.allowance(actor.addr, src.addr) < _wad) addExpectedError("Dai/insufficient-allowance");
+            if(dai.allowance(src.addr, actor.addr) < _wad) addExpectedError("Dai/insufficient-allowance");
             expectedError(reason);
         } catch (bytes memory reason) {
             console.log("TransferFrom failed: ");
@@ -202,6 +202,10 @@ contract DaiHandler is Test {
     function _selectDst(uint256 _dstIndex) internal view returns (Actor memory dst) {
         uint256 index = bound(_dstIndex, 0, dsts.length - 1);
         dst = dsts[index];
+    }
+
+    function dstsLength() external view returns (uint256) {
+        return dsts.length;
     }
 
     function addExpectedError(string memory _err) internal {
