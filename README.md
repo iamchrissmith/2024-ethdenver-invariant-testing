@@ -1,6 +1,7 @@
 # Invariant Fuzz Testing Presentation and Code
 
 ## What is this and whoami
+
 This repo is built for a talk I am giving at EthDenver 2024 to explain what invariant fuzz testing is and show how to use it with [Foundry](https://book.getfoundry.sh/forge/invariant-testing).
 
 I am an independent security research who works with clients through invariant test engineering, security reviews and protocol/technical advising.
@@ -19,3 +20,28 @@ DAI code has been updated slighlty to be compatible with Solidity 0.8 and Foundr
 - `1-invariant-setup`: [Setting up basic invariant testing infrastructure](https://github.com/iamchrissmith/2024-ethdenver-invariant-testing/pull/1)
 - `2-handler-setup`: [Setting up the functionality of the Handler](https://github.com/iamchrissmith/2024-ethdenver-invariant-testing/pull/2)
 - `3-add-balance-invariant`: [Adding our first real invariant](https://github.com/iamchrissmith/2024-ethdenver-invariant-testing/pull/3)
+
+### 1 - Invariant Setup
+
+branch: `1-invariant-setup`
+
+Important Concepts:
+
+`runs` and `depth` parameters for the forge command/`foundry.toml`. As explained from Foundry Book:
+> runs: Number of times that a sequence of function calls is generated and run.
+> depth: Number of function calls made in a given run. All defined invariants are asserted after each function call is made. If a function call reverts, the depth counter still increments.
+
+`fail_on_revert`
+Set in `foundry.toml`. When set to `true` (my preference) it will fail the tests when it hits an unexpected `revert`.
+
+#### Invariants
+
+These are the files/tests that will define the rules that should always be true.
+
+#### Handlers
+
+These contracts are essentially wrappers around the contracts/functionality we want to test.  They allow us to define test specific conditions and rules to make our tests more robust.
+
+#### Regressions
+
+If we find a failing sequence, these are the unit tests that we can use to reproduce the failure and check our fix.
